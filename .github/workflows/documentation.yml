@@ -44,8 +44,9 @@ jobs:
           result-encoding: string
           script: |
             const branchName = process.env.GITHUB_REF_NAME
-            const releaseVersion = branchName.substring( branchName.lastIndexOf('-') + 1 , branchName.length )
-            return "v" + releaseVersion
+            const prefix = 'v'
+            const releaseVersion = branchName.substring(branchName.lastIndexOf('-') + 1, branchName.length)
+            return releaseVersion.startsWith(prefix) ? releaseVersion : prefix + releaseVersion
 
       - name: Get latest repository version
         id: latest_release_version
