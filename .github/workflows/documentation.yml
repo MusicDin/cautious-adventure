@@ -3,8 +3,9 @@ on:
   push:
     branches:
       - "release-*"
-      #- master
-      #- feature/multiple-servers
+  release:
+    types: 
+      - published
 
 env:
   PYTHON_VERSION: 3.x
@@ -35,17 +36,17 @@ jobs:
             mkdocs-redirects>=1.0 \
             pygments>=2.11 \
             pymdown-extensions>=9.3
-      # mike >= 1.2 \
 
-      - name: Extract release version from branch name
+      - name: Extract release version from the branch name
         id: branch_version
         uses: actions/github-script@v6
         with:
           result-encoding: string
           script: |
-            const branchName = process.env.GITHUB_REF
-            const releaseVersion = branchName.substring( branchName.lastIndexOf('-') + 1 , branchName.length )
-            return "v" + releaseVersion
+            const branchName = process.env.GITHUB_REF_NAME
+            const prefix = 'v'
+            const releaseVersion = branchName.substring(branchName.lastIndexOf('-') + 1, branchName.length)
+            return releaseVersion.startsWith(prefix) ? releaseVersion : prefix + releaseVersion
 
       - name: Get latest repository version
         id: latest_release_version
@@ -61,9 +62,10 @@ jobs:
         run: |
           echo "Branch version: $BRANCH_VERSION"
           echo "Latest version: $LATEST_VERSION"
-      # - name: Deploy documentation if on latest branch
-      #   run: mike deploy --push --update-aliases ${{ steps.branch_version.outputs.result }}
 
+      # Documentation is deployed only on the latest release branch.
+      # This prevents bugfixes on older releases to override the latest
+      # documentation.
       - name: Deploy documentation
         env:
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
