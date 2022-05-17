@@ -1,4 +1,4 @@
-site_name: Kubitect mike versioning
+site_name: Kubitect mike versioning 2
 
 repo_url: https://github.com/musicdin/cautious-adventure
 repo_name: MusicDin/cautious-adventure
@@ -47,7 +47,7 @@ extra_javascript:
 extra:
   version:
     provider: mike
-    #default: stable
+    default: stable
 
 plugins:
   - search
