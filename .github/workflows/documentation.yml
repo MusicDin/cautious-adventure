@@ -2,7 +2,8 @@ name: documentation
 on:
   push:
     branches:
-      - master
+      - "release-*"
+      #- master
       #- feature/multiple-servers
 
 env:
@@ -34,6 +35,39 @@ jobs:
             mkdocs-redirects>=1.0 \
             pygments>=2.11 \
             pymdown-extensions>=9.3
+      # mike >= 1.2 \
+
+      - name: Extract release version from branch name
+        id: branch_version
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const branchName = process.env.GITHUB_REF
+            const releaseVersion = branchName.substring( branchName.lastIndexOf('-') + 1 , branchName.length )
+            return "v" + releaseVersion
+
+      - name: Get latest repository version
+        id: latest_release_version
+        uses: oprypin/find-latest-tag@v1.1.0
+        with:
+          repository: ${{ github.repository }}
+          prefix: 'v'
+        
+      - name: Print versions
+        env:
+          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+          LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+        run: |
+          echo "Branch version: $BRANCH_VERSION"
+          echo "Latest version: $LATEST_VERSION"
+      # - name: Deploy documentation if on latest branch
+      #   run: mike deploy --push --update-aliases ${{ steps.branch_version.outputs.result }}
 
       - name: Deploy documentation
-        run: mkdocs gh-deploy --force
+        env:
+          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+          LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+        if: contains( env.LATEST_VERSION, env.BRANCH_VERSION )
+        run: |
+          mkdocs gh-deploy --force
