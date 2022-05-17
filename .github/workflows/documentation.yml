@@ -56,7 +56,7 @@ jobs:
       - name: Print versions
         env:
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
-          LATEST_VERSION: ${{ steps.latest_release_version.outputs.result }}
+          LATEST_VERSION: ${{ steps.latest_release_version.tag }}
         run: |
           echo "Branch version: $BRANCH_VERSION"
           echo "Latest version: $LATEST_VERSION"
