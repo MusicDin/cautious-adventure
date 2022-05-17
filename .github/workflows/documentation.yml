@@ -36,7 +36,6 @@ jobs:
             mkdocs-redirects>=1.0 \
             pygments>=2.11 \
             pymdown-extensions>=9.3
-      # mike >= 1.2 \
 
       - name: Extract release version from the branch name
         id: branch_version
@@ -62,9 +61,10 @@ jobs:
         run: |
           echo "Branch version: $BRANCH_VERSION"
           echo "Latest version: $LATEST_VERSION"
-      # - name: Deploy documentation if on latest branch
-      #   run: mike deploy --push --update-aliases ${{ steps.branch_version.outputs.result }}
 
+      # Documentation is deployed only on the latest release branch.
+      # This prevents bugfixes on older releases to override the latest
+      # documentation.
       - name: Deploy documentation
         env:
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
