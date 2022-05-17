@@ -17,8 +17,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Set up Python runtime
         uses: actions/setup-python@v3
@@ -49,15 +47,27 @@ jobs:
             const releaseVersion = branchName.substring( branchName.lastIndexOf('-') + 1 , branchName.length )
             return "v" + releaseVersion
 
-      - name: Get latest release version
+      - name: Get latest repository version
         id: latest_release_version
-        uses: "WyriHaximus/github-action-get-previous-tag@v1.1.0"
+        uses: actions-ecosystem/action-release-label@v1.6.0
+        with:
+          semver_only: true
+
+      - name: Print versions
+        env:
+          BRANCH_VERSION: steps.branch_version.outputs.result
+          LATEST_VERSION: steps.latest_release_version.outputs.result
+        run: |
+          echo "Branch version: $BRANCH_VERSION"
+          echo "Latest version: $LATEST_VERSION"
 
       # - name: Deploy documentation if on latest branch
       #   run: mike deploy --push --update-aliases ${{ steps.branch_version.outputs.result }}
 
       - name: Deploy documentation
-        run: mkdocs gh-deploy --force
+
         if: contains( steps.latest_release_version.outputs.result, steps.branch_version.outputs.result )
+        run: |
+          mkdocs gh-deploy --force
 
 
