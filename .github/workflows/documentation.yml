@@ -3,8 +3,9 @@ on:
   push:
     branches:
       - "release-*"
-      #- master
-      #- feature/multiple-servers
+  release:
+    types: 
+      - published
 
 env:
   PYTHON_VERSION: 3.x
@@ -43,7 +44,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const branchName = process.github.ref_name
+            const branchName = process.env.GITHUB_REF_NAME
             const releaseVersion = branchName.substring( branchName.lastIndexOf('-') + 1 , branchName.length )
             return "v" + releaseVersion
 
