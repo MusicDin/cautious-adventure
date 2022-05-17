@@ -37,13 +37,13 @@ jobs:
             pymdown-extensions>=9.3
       # mike >= 1.2 \
 
-      - name: Extract release version from branch name
+      - name: Extract release version from the branch name
         id: branch_version
         uses: actions/github-script@v6
         with:
           result-encoding: string
           script: |
-            const branchName = process.env.GITHUB_REF
+            const branchName = github.ref_name
             const releaseVersion = branchName.substring( branchName.lastIndexOf('-') + 1 , branchName.length )
             return "v" + releaseVersion
 
