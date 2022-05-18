@@ -16,10 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       deploy: ${{ contains( env.LATEST_VERSION, env.BRANCH_VERSION ) }}
-    steps:  
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
+    steps:
       - name: Extract release version from the branch name
         id: branch_version
         uses: actions/github-script@v6
