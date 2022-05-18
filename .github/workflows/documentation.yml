@@ -61,10 +61,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         
-      - name: Print env variables
+      - name: Print deploy condition
         run: |
-          echo "Branch version: ${{ env.BRANCH_VERSION }}"
-          echo "Latest version: ${{ env.LATEST_VERSION }}"
+          echo "¸Deploy: ${{ ${{ needs.check.outputs.deploy }} }}"
 
       
 #       - name: Set up Python runtime
