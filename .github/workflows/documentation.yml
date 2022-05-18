@@ -15,7 +15,7 @@ jobs:
     name: Check if documentation should be deployed
     runs-on: ubuntu-latest
     outputs:
-      deploy: ${{ contains( env.LATEST_VERSION, env.BRANCH_VERSION ) }}
+      deploy: ${{ steps.verify.outputs.deploy }}
     steps:
       - name: Extract release version from the branch name
         id: branch_version
@@ -43,6 +43,7 @@ jobs:
         run: |
           echo "BRANCH_VERSION=$BRANCH_VERSION" >> $GITHUB_ENV
           echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+          echo "::set-output name=deploy::${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}"
           
       - name: Print env variables
         run: |
