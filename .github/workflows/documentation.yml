@@ -56,14 +56,14 @@ jobs:
     name: Build documentation
     runs-on: ubuntu-latest
     needs: check
-    if: ${{ needs.check.outputs.deploy }}
+    if: needs.check.outputs.deploy
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         
       - name: Print deploy condition
         run: |
-          echo "¸Deploy: ${{ needs.check.outputs.deploy }}"
+          echo "Deploy: ${{ needs.check.outputs.deploy }}"
 
       
 #       - name: Set up Python runtime
