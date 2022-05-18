@@ -18,58 +18,68 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Set up Python runtime
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install Python dependencies
-        run: |
-          pip install \
-            jinja2>=3.1 \
-            markdown>=3.3 \
-            mkdocs>=1.3 \
-            mkdocs-material>=8.2.11 \
-            mkdocs-material-extensions>=1.0.3 \
-            mkdocs-minify-plugin>=0.5 \
-            mkdocs-redirects>=1.0 \
-            pygments>=2.11 \
-            pymdown-extensions>=9.3
-
-      - name: Extract release version from the branch name
-        id: branch_version
-        uses: actions/github-script@v6
-        with:
-          result-encoding: string
-          script: |
-            const branchName = process.env.GITHUB_REF_NAME
-            const prefix = 'v'
-            const releaseVersion = branchName.substring(branchName.lastIndexOf('-') + 1, branchName.length)
-            return releaseVersion.startsWith(prefix) ? releaseVersion : prefix + releaseVersion
-
-      - name: Get latest repository version
-        id: latest_release_version
-        uses: oprypin/find-latest-tag@v1.1.0
-        with:
-          repository: ${{ github.repository }}
-          prefix: 'v'
-        
-      - name: Print versions
+      
+      - name: Set env variables
         env:
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
           LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+          
+      - name: Print env variables
         run: |
           echo "Branch version: $BRANCH_VERSION"
           echo "Latest version: $LATEST_VERSION"
 
-      # Documentation is deployed only on the latest release branch.
-      # This prevents bugfixes on older releases to override the latest
-      # documentation.
-      - name: Deploy documentation
-        env:
-          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
-          LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
-        if: contains( env.LATEST_VERSION, env.BRANCH_VERSION )
-        run: |
-          mkdocs gh-deploy --force
+#       - name: Set up Python runtime
+#         uses: actions/setup-python@v3
+#         with:
+#           python-version: ${{ env.PYTHON_VERSION }}
+
+#       - name: Install Python dependencies
+#         run: |
+#           pip install \
+#             jinja2>=3.1 \
+#             markdown>=3.3 \
+#             mkdocs>=1.3 \
+#             mkdocs-material>=8.2.11 \
+#             mkdocs-material-extensions>=1.0.3 \
+#             mkdocs-minify-plugin>=0.5 \
+#             mkdocs-redirects>=1.0 \
+#             pygments>=2.11 \
+#             pymdown-extensions>=9.3
+
+#       - name: Extract release version from the branch name
+#         id: branch_version
+#         uses: actions/github-script@v6
+#         with:
+#           result-encoding: string
+#           script: |
+#             const branchName = process.env.GITHUB_REF_NAME
+#             const prefix = 'v'
+#             const releaseVersion = branchName.substring(branchName.lastIndexOf('-') + 1, branchName.length)
+#             return releaseVersion.startsWith(prefix) ? releaseVersion : prefix + releaseVersion
+
+#       - name: Get latest repository version
+#         id: latest_release_version
+#         uses: oprypin/find-latest-tag@v1.1.0
+#         with:
+#           repository: ${{ github.repository }}
+#           prefix: 'v'
+        
+#       - name: Print versions
+#         env:
+#           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+#           LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+#         run: |
+#           echo "Branch version: $BRANCH_VERSION"
+#           echo "Latest version: $LATEST_VERSION"
+
+#       # Documentation is deployed only on the latest release branch.
+#       # This prevents bugfixes on older releases to override the latest
+#       # documentation.
+#       - name: Deploy documentation
+#         env:
+#           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+#           LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+#         if: contains( env.LATEST_VERSION, env.BRANCH_VERSION )
+#         run: |
+#           mkdocs gh-deploy --force
