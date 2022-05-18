@@ -63,7 +63,7 @@ jobs:
         
       - name: Print deploy condition
         run: |
-          echo "¸Deploy: ${{ ${{ needs.check.outputs.deploy }} }}"
+          echo "¸Deploy: ${{ needs.check.outputs.deploy }}"
 
       
 #       - name: Set up Python runtime
