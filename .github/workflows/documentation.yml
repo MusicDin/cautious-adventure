@@ -42,8 +42,8 @@ jobs:
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
           LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
         run: |
-          echo "Branch version: ${{ BRANCH_VERSION }}"
-          echo "Latest version: ${{ LATEST_VERSION }}"
+          echo "Branch version: ${{ env.BRANCH_VERSION }}"
+          echo "Latest version: ${{ env.LATEST_VERSION }}"
           echo "Env variables set"
           
       - name: Print env variables
