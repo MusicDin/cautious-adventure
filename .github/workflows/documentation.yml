@@ -52,7 +52,7 @@ jobs:
     name: Build and deploy docs
     runs-on: ubuntu-latest
     needs: check
-    if: needs.check.outputs.deploy == true
+    if: needs.check.outputs.deploy == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
