@@ -11,11 +11,14 @@ env:
   PYTHON_VERSION: 3.x
 
 jobs:
-  documentation:
-    name: Build documentation
+  check:
+    name: Check if documentation should be deployed
     runs-on: ubuntu-latest
-    steps:
-
+    
+    outputs:
+      deploy: contains( env.LATEST_VERSION, env.BRANCH_VERSION )
+      
+    steps:  
       - name: Checkout repository
         uses: actions/checkout@v3
       
@@ -29,29 +32,16 @@ jobs:
             const prefix = 'v'
             const releaseVersion = branchName.substring(branchName.lastIndexOf('-') + 1, branchName.length)
             return releaseVersion.startsWith(prefix) ? releaseVersion : prefix + releaseVersion
-
+            
       - name: Get latest repository version
         id: latest_release_version
         uses: oprypin/find-latest-tag@v1.1.0
         with:
           repository: ${{ github.repository }}
           prefix: 'v'
-        
-      - name: Set env variables
-        env:
-          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
-          LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
-        run: |
-          echo "Branch version: ${{ env.BRANCH_VERSION }}"
-          echo "Latest version: ${{ env.LATEST_VERSION }}"
-          echo "Env variables set"
-          
-      - name: Print env variables
-        run: |
-          echo "Branch version: ${{ env.BRANCH_VERSION }}"
-          echo "Latest version: ${{ env.LATEST_VERSION }}"
-          
+
       - name: Set env variables using echo
+        id: verify
         env:
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
           LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
@@ -63,6 +53,48 @@ jobs:
         run: |
           echo "Branch version: ${{ env.BRANCH_VERSION }}"
           echo "Latest version: ${{ env.LATEST_VERSION }}"
+
+#   documentation:
+#     name: Build documentation
+#     runs-on: ubuntu-latest
+#     steps:
+
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+      
+#       - name: Extract release version from the branch name
+#         id: branch_version
+#         uses: actions/github-script@v6
+#         with:
+#           result-encoding: string
+#           script: |
+#             const branchName = process.env.GITHUB_REF_NAME
+#             const prefix = 'v'
+#             const releaseVersion = branchName.substring(branchName.lastIndexOf('-') + 1, branchName.length)
+#             return releaseVersion.startsWith(prefix) ? releaseVersion : prefix + releaseVersion
+
+#       - name: Get latest repository version
+#         id: latest_release_version
+#         uses: oprypin/find-latest-tag@v1.1.0
+#         with:
+#           repository: ${{ github.repository }}
+#           prefix: 'v'
+          
+#       - name: Set env variables using echo
+#         id: verify
+#         env:
+#           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+#           LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+#         run: |
+#           echo "BRANCH_VERSION=$BRANCH_VERSION" >> $GITHUB_ENV
+#           echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+          
+#       - name: Print env variables
+#         run: |
+#           echo "Branch version: ${{ env.BRANCH_VERSION }}"
+#           echo "Latest version: ${{ env.LATEST_VERSION }}"
+      
+      
 
 #       - name: Set up Python runtime
 #         uses: actions/setup-python@v3
