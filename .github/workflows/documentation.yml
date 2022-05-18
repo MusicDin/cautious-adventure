@@ -15,7 +15,7 @@ jobs:
     name: Check if documentation should be deployed
     runs-on: ubuntu-latest
     outputs:
-      deploy: contains( env.LATEST_VERSION, env.BRANCH_VERSION )
+      deploy: ${{ contains( env.LATEST_VERSION, env.BRANCH_VERSION ) }}
     steps:  
       - name: Checkout repository
         uses: actions/checkout@v3
