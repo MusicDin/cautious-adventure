@@ -48,6 +48,7 @@ jobs:
         run: |
           echo "Branch version: ${{ env.BRANCH_VERSION }}"
           echo "Latest version: ${{ env.LATEST_VERSION }}"
+          echo "Contains: ${{ contains( env.LATEST_VERSION, env.BRANCH_VERSION ) }}"
 
   documentation:
     name: Build documentation
