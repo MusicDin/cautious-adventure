@@ -41,7 +41,23 @@ jobs:
         env:
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
           LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
-        run: echo "Env variables set"
+        run: |
+          echo "Branch version: ${{ BRANCH_VERSION }}"
+          echo "Latest version: ${{ LATEST_VERSION }}"
+          echo "Env variables set"
+          
+      - name: Print env variables
+        run: |
+          echo "Branch version: ${{ env.BRANCH_VERSION }}"
+          echo "Latest version: ${{ env.LATEST_VERSION }}"
+          
+      - name: Set env variables using echo
+        env:
+          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+          LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+        run: |
+          echo "BRANCH_VERSION=$BRANCH_VERSION" >> $GITHUB_ENV
+          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
           
       - name: Print env variables
         run: |
