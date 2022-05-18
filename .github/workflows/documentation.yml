@@ -2,7 +2,7 @@ name: documentation
 on:
   push:
     branches:
-      - "release-**"
+      - "release-*"
   release:
     types: 
       - published
@@ -23,6 +23,7 @@ jobs:
         env:
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
           LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+        run: echo "Env variables set"
           
       - name: Print env variables
         run: |
