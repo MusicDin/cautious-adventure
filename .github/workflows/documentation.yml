@@ -39,7 +39,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            echo 'what'
+            echo blah
             prefix = 'v'
             branch = ${{ env.BRANCH_NAME }}
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
