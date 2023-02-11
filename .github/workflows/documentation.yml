@@ -38,7 +38,7 @@ jobs:
         id: branch_version
         uses: actions/github-script@v6
         env:
-          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          BRANCH_NAME: ${{ env.GITHUB_HEAD_REF }}
         with:
           result-encoding: string
           script: |
