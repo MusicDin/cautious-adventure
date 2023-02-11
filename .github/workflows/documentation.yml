@@ -29,6 +29,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        
+      - name: Set environment variables (branch name)
+        run: |
+          echo "BRANCH_VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+          
+      - name: Echo
+        run: echo "BRANCH_VERSION=${{ env.BRANCH_VERSION }}"
 
       - name: Extract version from branch name
         id: branch_version
@@ -42,7 +49,7 @@ jobs:
             const branch = process.env.BRANCH_NAME
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
-            return branch.startsWith('release') ? version : branch
+            return branch.includes('release') ? version : branch
 
       - name: Get latest repository version
         id: latest_version
