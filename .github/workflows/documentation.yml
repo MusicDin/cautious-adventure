@@ -74,7 +74,8 @@ jobs:
             mkdocs-minify-plugin>=0.5 \
             mkdocs-redirects>=1.0 \
             pygments>=2.11 \
-            pymdown-extensions>=9.3
+            pymdown-extensions>=9.3 \
+            mike>=1.1.2
 
       - name: Deploy documentation
         env:
