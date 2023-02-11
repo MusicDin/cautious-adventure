@@ -1,9 +1,15 @@
+# Documentation deployment workflow.
+
+# Documentation is always deployed for master and releases branch.
+# deployed  is deployed on the latest release branch or on the new
+# latest release. This prevents bugfixes on older releases to override the
+# latest documentation.
 name: documentation
 on:
   push:
     branches:
       - "release-*"
-      #- master
+      - master
   release:
     types:
       - published
@@ -12,16 +18,15 @@ env:
   PYTHON_VERSION: 3.x
 
 jobs:
-
-  # Documentation is deployed only on the latest release branch or on the new
-  # latest release. This prevents bugfixes on older releases to override the
-  # latest documentation.
   check:
     name: Check if docs should be deployed
     runs-on: ubuntu-latest
     outputs:
       deploy: ${{ steps.verify.outputs.deploy }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Extract release version from the branch name (or tag)
         id: branch_version
         uses: actions/github-script@v6
@@ -46,16 +51,9 @@ jobs:
           LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
         run: |
+          echo "::set-output name=latestVersion::${{ env.LATEST_VERSION }}"
+          echo "::set-output name=branchVersion::${{ env.LATEST_VERSION }}"
           echo "::set-output name=deploy::${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}"
-
-  documentation:
-    name: Build and deploy docs
-    runs-on: ubuntu-latest
-    needs: check
-    if: needs.check.outputs.deploy == 'true'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
 
       - name: Set up Python runtime
         uses: actions/setup-python@v3
@@ -76,5 +74,57 @@ jobs:
             pymdown-extensions>=9.3
 
       - name: Deploy documentation
+        env:
+          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
         run: |
-          mkdocs gh-deploy --force
+          mike deploy --push --update-aliases ${{ BRANCH_VERSION }}
+          
+      - name: Update documentation alias for latest
+        env:
+          LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+        if: ${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
+        run: |
+          mike deploy --push --update-aliases latest
+          mike set-default --push latest
+
+  # documentation:
+  #   name: Build and deploy docs
+  #   runs-on: ubuntu-latest
+  #   needs: check
+  #   if: needs.check.outputs.deploy == 'true'
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
+
+  #     - name: Set up Python runtime
+  #       uses: actions/setup-python@v3
+  #       with:
+  #         python-version: ${{ env.PYTHON_VERSION }}
+
+  #     - name: Install Python dependencies
+  #       run: |
+  #         pip install \
+  #           jinja2>=3.1 \
+  #           markdown>=3.3 \
+  #           mkdocs>=1.3 \
+  #           mkdocs-material>=8.2.11 \
+  #           mkdocs-material-extensions>=1.0.3 \
+  #           mkdocs-minify-plugin>=0.5 \
+  #           mkdocs-redirects>=1.0 \
+  #           pygments>=2.11 \
+  #           pymdown-extensions>=9.3
+
+  #     - name: Deploy documentation
+  #           # Assume 
+  #           # } else {
+  #           # if $ver == latest {
+  #           #   mike deploy --push --update-aliases $ver latest
+  #           # } else {
+  #           #   mike deploy --push --update-aliases $ver
+  #           # }
+  #           # mkdocs gh-deploy --force
+  #       run: |
+  #         mike set-default --push latest
+  #         mike deploy --push --update-aliases 0.1 latest
+          
