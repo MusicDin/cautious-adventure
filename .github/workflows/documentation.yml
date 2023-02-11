@@ -33,16 +33,12 @@ jobs:
       - name: Set environment variables (branch name)
         run: |
           echo "BRANCH_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
-          
-      - name: Echo
-        run: echo "BRANCH_NAME=${{ env.BRANCH_NAME }}"
 
       - name: Extract version from branch name
         id: branch_version
         uses: actions/github-script@v6
         env:
-          #${GITHUB_REF##*/}
-          BRANCH_NAME: env.GITHUB_REF##*/
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
         with:
           result-encoding: string
           script: |
