@@ -35,7 +35,9 @@ jobs:
           echo "BRANCH_NAME=${GITHUB_REF##*/}"
         
       - name: Echo
-        run: echo "${{ env.BRANCH_NAME }}"
+        run: |
+          echo "${{ env.BRANCH_NAME }}"
+          echo "${{ env.GITHUB_REF }}"
 
       - name: Extract release version from branch name
         id: branch_version
