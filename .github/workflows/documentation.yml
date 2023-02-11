@@ -33,15 +33,14 @@ jobs:
       - name: Extract release version from the branch name (or tag)
         id: branch_version
         uses: actions/github-script@v6
-        env: 
-          BRANCH_NAME: ${{ process.env.GITHUB_REF_NAME }}
-        if: ${{ env.BRANCH_NAME != "master" }}
+        if: ${{ process.env.GITHUB_REF_NAME != "master" }}
         with:
           result-encoding: string
           script: |
             const prefix = 'v'
-            const releaseVersion = env.BRANCH_NAME.substring(env.BRANCH_NAME.lastIndexOf('-') + 1, env.BRANCH_NAME.length)
-            return releaseVersion.startsWith(prefix) ? releaseVersion : prefix + releaseVersion
+            const branch = process.env.GITHUB_REF_NAME
+            const release = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
+            return release.startsWith(prefix) ? release : prefix + release
 
       - name: Get latest repository version
         id: latest_release_version
