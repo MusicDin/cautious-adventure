@@ -29,16 +29,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        
+      - name: Extract branch name
+        run: echo "BRANCH_NAME=${ GITHUB_REF#refs/*/ }" >> $GITHUB_ENV
 
       - name: Extract release version from the branch name (or tag)
         id: branch_version
         uses: actions/github-script@v6
-        if: ${{ process.env.GITHUB_REF_NAME != "master" }}
+        if: ${{ env.BRANCH_NAME != "master" }}
         with:
           result-encoding: string
           script: |
             const prefix = 'v'
-            const branch = process.env.GITHUB_REF_NAME
+            const branch = env.BRANCH_NAME
             const release = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             return release.startsWith(prefix) ? release : prefix + release
 
