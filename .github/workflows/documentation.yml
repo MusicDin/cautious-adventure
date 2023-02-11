@@ -7,18 +7,12 @@
 name: documentation
 on:
   push:
-    # tags:
-    #   - v*
     branches:
       - release-*
       - master
-  # release:
-  #   types:
-  #     - published
-
-env:
-  PYTHON_VERSION: 3.x
-
+    tags:
+      - v*
+      
 jobs:
   deploy_docs:
     name: Deploy documentation
@@ -90,11 +84,11 @@ jobs:
           git fetch origin gh-pages --depth=1
 
       - name: Deploy documentation
+        if: ${{ github.ref_type == 'branch' }}
         run: |
           mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }}
           
       - name: Update documentation alias for latest
-        if: ${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
-        # mike set-default --push latest
+        if: ${{ github.ref_type == 'tag' && contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
         run: |
-          mike deploy --push --update-aliases latest
+          mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }} latest
