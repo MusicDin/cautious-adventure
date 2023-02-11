@@ -40,11 +40,12 @@ jobs:
       - name: Extract release version from branch name
         id: branch_version
         uses: actions/github-script@v6
+        #${{ env.BRANCH_NAME }}
         with:
           result-encoding: string
           script: |
             const prefix = 'v'
-            const branch = ${{ env.BRANCH_NAME }}
+            const branch = 'release-0.3'
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
             return contains(branch, 'asdaskdasldb') ? version : branch
