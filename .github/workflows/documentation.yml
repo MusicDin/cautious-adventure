@@ -50,11 +50,6 @@ jobs:
           echo "BRANCH_VERSION=${{ steps.branch_version.outputs.result }}" >> $GITHUB_ENV
           echo "LATEST_VERSION=${{ steps.latest_version.outputs.tag }}" >> $GITHUB_ENV
 
-      - name: Print versions
-        run: |
-          echo "LATEST_VERSION=${{ env.LATEST_VERSION }}"
-          echo "BRANCH_VERSION=${{ env.BRANCH_VERSION }}"
-
       - name: Set up Python runtime
         uses: actions/setup-python@v3
         with:
@@ -88,7 +83,7 @@ jobs:
         run: |
           mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }}
           
-      - name: Update documentation alias for latest
+      - name: Deploy documentation and update alias for latest
         if: ${{ github.ref_type == 'tag' && contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
         run: |
           mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }} latest
