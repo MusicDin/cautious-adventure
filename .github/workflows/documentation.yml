@@ -33,6 +33,15 @@ jobs:
       - name: Set environment variables (branch name)
         run: |
           echo "BRANCH_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
+          
+          
+              
+      - name: Echo
+        run: |
+          echo "BRANCH_NAME=${GITHUB_REF_NAME}" 
+          echo "BRANCH_NAME=${{ env.GITHUB_REF_NAME }}" 
+          echo "BRANCH_NAME=${{ github.ref_name }}"
+          
 
       - name: Extract version from branch name
         id: branch_version
