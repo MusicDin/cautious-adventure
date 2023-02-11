@@ -77,6 +77,11 @@ jobs:
             pymdown-extensions>=9.3 \
             mike>=1.1.2
 
+      - name: Configure Git user
+        run: |
+          git config --local user.email "bot@kubitect.io"
+          git config --local user.name "kubitect-bot"
+
       - name: Deploy documentation
         env:
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
