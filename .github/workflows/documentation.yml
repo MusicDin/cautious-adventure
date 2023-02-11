@@ -44,10 +44,10 @@ jobs:
           result-encoding: string
           script: |
             const prefix = 'v'
-            const branch = env.BRANCH_NAME
+            const branch = $BRANCH_NAME
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
-            return contains(env.BRANCH_NAME, 'asdaskdasldb') ? version : branch
+            return contains(branch, 'asdaskdasldb') ? version : branch
 
       - name: Get latest repository version
         id: latest_release_version
