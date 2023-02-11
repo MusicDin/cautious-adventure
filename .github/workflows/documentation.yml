@@ -29,17 +29,28 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        
+      - name: Extract branch name
+        run: |
+          echo "BRANCH_NAME=${GITHUB_REF##*/}"
+        
+      - name: Echo
+        run: echo "${{ env.BRANCH_NAME }}"
 
-      - name: Extract release version from the branch name (or tag)
+      - name: Extract release version from branch name
         id: branch_version
         uses: actions/github-script@v6
+        env:
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
         with:
           result-encoding: string
           script: |
-            const branchName = process.env.GITHUB_REF_NAME
             const prefix = 'v'
-            const releaseVersion = branchName.substring(branchName.lastIndexOf('-') + 1, branchName.length)
-            return releaseVersion.startsWith(prefix) ? releaseVersion : prefix + releaseVersion
+            const branch = process.env.BRANCH_NAME
+            version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
+            version = version.startsWith(prefix) ? version : prefix + version
+            return branch.includes('release') ? version : branch
+          
 
       - name: Get latest repository version
         id: latest_release_version
@@ -48,54 +59,54 @@ jobs:
           repository: ${{ github.repository }}
           prefix: 'v'
 
-      # - name: Verify if the latest version contains current branch/tag version
-      #   id: verify
+      - name: Set environment variables
+        run: |
+          echo "LATEST_VERSION=${{ steps.latest_release_version.outputs.tag }}" >> $GITHUB_ENV
+          echo "BRANCH_VERSION=${{ steps.branch_version.outputs.result }}" >> $GITHUB_ENV
+
+      - name: Print versions
+        run: |
+          echo "LATEST_VERSION=${{ env.LATEST_VERSION }}"
+          echo "BRANCH_VERSION=${{ env.BRANCH_VERSION }}"
+
+      # - name: Set up Python runtime
+      #   uses: actions/setup-python@v3
+      #   with:
+      #     python-version: ${{ matrix.python-version }}
+
+      # - name: Install Python dependencies
+      #   run: |
+      #     pip install \
+      #       jinja2>=3.1 \
+      #       markdown>=3.3 \
+      #       mkdocs>=1.3 \
+      #       mkdocs-material>=8.2.11 \
+      #       mkdocs-material-extensions>=1.0.3 \
+      #       mkdocs-minify-plugin>=0.5 \
+      #       mkdocs-redirects>=1.0 \
+      #       pygments>=2.11 \
+      #       pymdown-extensions>=9.3 \
+      #       mike>=1.1.2
+
+      # - name: Configure Git user
+      #   run: |
+      #     git config user.name github-actions
+      #     git config user.email github-actions@github.com
+
+      # - name: Deploy documentation
+      #   env:
+      #     BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+      #   run: |
+      #     mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }}
+          
+      # - name: Update documentation alias for latest
       #   env:
       #     LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
       #     BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+      #   if: ${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
+      #   # mike set-default --push latest
       #   run: |
-      #     echo "::set-output name=latestVersion::${{ env.LATEST_VERSION }}"
-      #     echo "::set-output name=branchVersion::${{ env.LATEST_VERSION }}"
-      #     echo "::set-output name=deploy::${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}"
-
-      - name: Set up Python runtime
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install Python dependencies
-        run: |
-          pip install \
-            jinja2>=3.1 \
-            markdown>=3.3 \
-            mkdocs>=1.3 \
-            mkdocs-material>=8.2.11 \
-            mkdocs-material-extensions>=1.0.3 \
-            mkdocs-minify-plugin>=0.5 \
-            mkdocs-redirects>=1.0 \
-            pygments>=2.11 \
-            pymdown-extensions>=9.3 \
-            mike>=1.1.2
-
-      - name: Configure Git user
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-
-      - name: Deploy documentation
-        env:
-          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
-        run: |
-          mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }}
-          
-      - name: Update documentation alias for latest
-        env:
-          LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
-          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
-        if: ${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
-        # mike set-default --push latest
-        run: |
-          mike deploy --push --update-aliases latest
+      #     mike deploy --push --update-aliases latest
           
 
   # documentation:
