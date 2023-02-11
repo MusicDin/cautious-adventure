@@ -65,36 +65,36 @@ jobs:
           echo "LATEST_VERSION=${{ env.LATEST_VERSION }}"
           echo "BRANCH_VERSION=${{ env.BRANCH_VERSION }}"
 
-#       - name: Set up Python runtime
-#         uses: actions/setup-python@v3
-#         with:
-#           python-version: ${{ matrix.python-version }}
+      - name: Set up Python runtime
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
 
-#       - name: Install Python dependencies
+      - name: Install Python dependencies
+        run: |
+          pip install \
+            jinja2>=3.1 \
+            markdown>=3.3 \
+            mkdocs>=1.3 \
+            mkdocs-material>=8.2.11 \
+            mkdocs-material-extensions>=1.0.3 \
+            mkdocs-minify-plugin>=0.5 \
+            mkdocs-redirects>=1.0 \
+            pygments>=2.11 \
+            pymdown-extensions>=9.3 \
+            mike>=1.1.2
+
+#       - name: Configure Git user
 #         run: |
-#           pip install \
-#             jinja2>=3.1 \
-#             markdown>=3.3 \
-#             mkdocs>=1.3 \
-#             mkdocs-material>=8.2.11 \
-#             mkdocs-material-extensions>=1.0.3 \
-#             mkdocs-minify-plugin>=0.5 \
-#             mkdocs-redirects>=1.0 \
-#             pygments>=2.11 \
-#             pymdown-extensions>=9.3 \
-#             mike>=1.1.2
+#           git config user.name github-actions
+#           git config user.email github-actions@github.com
 
-      # - name: Configure Git user
-      #   run: |
-      #     git config user.name github-actions
-      #     git config user.email github-actions@github.com
-
-#       - name: Deploy documentation
-#         run: |
-#           mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }}
+      - name: Deploy documentation
+        run: |
+          mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }}
           
-#       - name: Update documentation alias for latest
-#         if: ${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
-#         # mike set-default --push latest
-#         run: |
-#           mike deploy --push --update-aliases latest
+      - name: Update documentation alias for latest
+        if: ${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
+        # mike set-default --push latest
+        run: |
+          mike deploy --push --update-aliases latest
