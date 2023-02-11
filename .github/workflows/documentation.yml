@@ -44,7 +44,7 @@ jobs:
           result-encoding: string
           script: |
             const prefix = 'v'
-            const branch = 'release-0.3'
+            const branch = process.env.BRANCH_NAME
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
             return branch.includes('release') ? version : branch
