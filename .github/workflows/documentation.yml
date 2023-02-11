@@ -36,7 +36,7 @@ jobs:
       - name: Extract release version from the branch name (or tag)
         id: branch_version
         uses: actions/github-script@v6
-        if: ${{ env.BRANCH_NAME != "master" }}
+        if: ${{ env.BRANCH_NAME != master }}
         with:
           result-encoding: string
           script: |
