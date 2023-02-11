@@ -40,15 +40,15 @@ jobs:
       - name: Extract release version from branch name
         id: branch_version
         uses: actions/github-script@v6
-        #${{ env.BRANCH_NAME }}
+        #
         with:
           result-encoding: string
           script: |
             const prefix = 'v'
-            const branch = 'release-0.3'
+            const branch = ${{ env.BRANCH_NAME }}
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
-            return ${{ contains(env.BRANCH_NAME, 'asdaskdasldb') }} ? version : branch
+            return ${{ contains(env.BRANCH_NAME, 'release') }} ? version : branch
 
       - name: Get latest repository version
         id: latest_release_version
@@ -59,7 +59,7 @@ jobs:
 
       - name: Set environment variables
         run: |
-          echo "LATEST_VERSION=${{   steps.latest_release_version.outputs.tag }}" >> $GITHUB_ENV
+          echo "LATEST_VERSION=${{ steps.latest_release_version.outputs.tag }}" >> $GITHUB_ENV
           echo "BRANCH_VERSION=${{ steps.branch_version.outputs.result }}" >> $GITHUB_ENV
 
       - name: Print versions
