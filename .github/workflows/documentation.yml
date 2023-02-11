@@ -41,7 +41,7 @@ jobs:
           result-encoding: string
           script: |
             const prefix = 'v'
-            const branch = ${BRANCH_NAME}
+            const branch = ${{ env.BRANCH_NAME }}
             const release = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             return release.startsWith(prefix) ? release : prefix + release
 
