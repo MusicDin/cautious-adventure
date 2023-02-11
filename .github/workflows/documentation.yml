@@ -45,10 +45,10 @@ jobs:
           result-encoding: string
           script: |
             const prefix = 'v'
-            const branch = ${{ env.BRANCH_NAME }}
+            const branch = 'release-0.3'
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
-            return ${{ contains(env.BRANCH_NAME, 'release') }} ? version : ${{ env.BRANCH_NAME }}
+            return ${{ contains(env.BRANCH_NAME, 'release') }} ? version : branch
 
       - name: Get latest repository version
         id: latest_release_version
