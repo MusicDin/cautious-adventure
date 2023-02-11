@@ -40,11 +40,13 @@ jobs:
       - name: Extract release version from branch name
         id: branch_version
         uses: actions/github-script@v6
+        env:
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
         with:
           result-encoding: string
           script: |
             const prefix = 'v'
-            const branch = ${{ env.BRANCH_NAME }}
+            const branch = process.env.BRANCH_NAME
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
             return branch.includes('release') ? version : branch
