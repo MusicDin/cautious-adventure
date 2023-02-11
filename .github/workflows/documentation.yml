@@ -7,22 +7,25 @@
 name: documentation
 on:
   push:
+    # tags:
+    #   - v*
     branches:
       - release-*
       - master
-  release:
-    types:
-      - published
+  # release:
+  #   types:
+  #     - published
 
 env:
   PYTHON_VERSION: 3.x
 
 jobs:
-  check:
-    name: Check if docs should be deployed
+  deploy_docs:
+    name: Deploy documentation
     runs-on: ubuntu-latest
-    outputs:
-      deploy: ${{ steps.verify.outputs.deploy }}
+    strategy:
+      matrix:
+        python-version: [ 3.8 ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -45,20 +48,21 @@ jobs:
           repository: ${{ github.repository }}
           prefix: 'v'
 
-      - name: Verify if the latest version contains current branch/tag version
-        id: verify
-        env:
-          LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
-          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
-        run: |
-          echo "::set-output name=latestVersion::${{ env.LATEST_VERSION }}"
-          echo "::set-output name=branchVersion::${{ env.LATEST_VERSION }}"
-          echo "::set-output name=deploy::${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}"
+      # - name: Verify if the latest version contains current branch/tag version
+      #   id: verify
+      #   env:
+      #     LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+      #     BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+      #   run: |
+      #     echo "::set-output name=latestVersion::${{ env.LATEST_VERSION }}"
+      #     echo "::set-output name=branchVersion::${{ env.LATEST_VERSION }}"
+      #     echo "::set-output name=deploy::${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}"
 
       - name: Set up Python runtime
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
 
       - name: Install Python dependencies
         run: |
@@ -84,9 +88,10 @@ jobs:
           LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
           BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
         if: ${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
+        # mike set-default --push latest
         run: |
           mike deploy --push --update-aliases latest
-          mike set-default --push latest
+          
 
   # documentation:
   #   name: Build and deploy docs
