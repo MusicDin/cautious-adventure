@@ -55,8 +55,8 @@ jobs:
 
       - name: Print versions
         run: |
-          echo "LATEST_VERSION=${{ BRANCH_VERSION }}"
-          echo "BRANCH_VERSION=${{ LATEST_VERSION }}"
+          echo "LATEST_VERSION=${{ env.LATEST_VERSION }}"
+          echo "BRANCH_VERSION=${{ env.BRANCH_VERSION }}"
 
       # - name: Set up Python runtime
       #   uses: actions/setup-python@v3
