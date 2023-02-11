@@ -42,7 +42,7 @@ jobs:
             prefix = 'v'
             branch = ${{ env.BRANCH_NAME }}
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
-            version = release.startsWith(prefix) ? release : prefix + release
+            version = version.startsWith(prefix) ? version : prefix + version
             return contains(env.BRANCH_NAME, 'release') ? version : branch
 
       - name: Get latest repository version
