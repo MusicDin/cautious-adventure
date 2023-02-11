@@ -33,7 +33,7 @@ jobs:
       - name: Extract branch name
         run: echo "BRANCH_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - name: Extract release version from the branch name (or tag)
+      - name: Extract release version from the branch name
         id: branch_version
         uses: actions/github-script@v6
         with:
