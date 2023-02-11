@@ -48,7 +48,7 @@ jobs:
             const branch = 'release-0.3'
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
-            return ${{ contains(env.BRANCH_NAME, 'asdaskdasldb') ? version : branch }}
+            return ${{ contains(env.BRANCH_NAME, 'asdaskdasldb') }} ? version : branch
 
       - name: Get latest repository version
         id: latest_release_version
