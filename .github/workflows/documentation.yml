@@ -37,6 +37,16 @@ jobs:
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
             return branch.includes('release') ? version : branch
+            
+                
+      - name: Shorten tag version
+        id: tag_version
+        if: ${{ github.ref_type == 'tag' }}
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          version = process.env.TAG_NAME
+          return version.substring(0, version.lastIndexOf('-'))
 
       - name: Get latest repository version
         id: latest_version
@@ -45,10 +55,12 @@ jobs:
           repository: ${{ github.repository }}
           prefix: 'v'
 
-      - name: Set environment variables
+      - name: Set environment variables for latest and branch version
         run: |
           echo "BRANCH_VERSION=${{ steps.branch_version.outputs.result }}" >> $GITHUB_ENV
           echo "LATEST_VERSION=${{ steps.latest_version.outputs.tag }}" >> $GITHUB_ENV
+          echo "TAG_VERSION=${{ steps.tag_version.outputs.tag }}" >> $GITHUB_ENV
+
 
       - name: Set up Python runtime
         uses: actions/setup-python@v3
@@ -84,6 +96,6 @@ jobs:
           mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }}
           
       - name: Deploy documentation and update alias for latest
-        if: ${{ github.ref_type == 'tag' && contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
+        if: ${{ github.ref_type == 'tag' && env.LATEST_VERSION == env.TAG_VERSION }}
         run: |
-          mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }} latest
+          mike deploy --push --update-aliases ${{ env.TAG_VERSION }} latest
