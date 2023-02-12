@@ -24,6 +24,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         
+      - name: Get latest repository version
+        id: latest_version
+        uses: oprypin/find-latest-tag@v1.1.0
+        with:
+          repository: ${{ github.repository }}
+          prefix: 'v'
+        
       - name: Extract version from branch name
         id: branch_version
         uses: actions/github-script@v6
@@ -37,18 +44,32 @@ jobs:
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
             return branch.includes('release') ? version : branch
+                
+      - name: Shorten tag version
+        id: tag_version
+        if: ${{ github.ref_type == 'tag' }}
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        with: 
+          result-encoding: string
+          script: |
+            version = process.env.TAG_NAME
+            return version.substring(0, version.lastIndexOf('-'))
 
-      - name: Get latest repository version
-        id: latest_version
-        uses: oprypin/find-latest-tag@v1.1.0
-        with:
-          repository: ${{ github.repository }}
-          prefix: 'v'
-
-      - name: Set environment variables
+      - name: Export versions as environment variables
         run: |
           echo "BRANCH_VERSION=${{ steps.branch_version.outputs.result }}" >> $GITHUB_ENV
           echo "LATEST_VERSION=${{ steps.latest_version.outputs.tag }}" >> $GITHUB_ENV
+          echo "TAG_VERSION=${{ steps.tag_version.outputs.result }}" >> $GITHUB_ENV
+      
+      - name: Configure Git user
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          
+      - name: Fetch gh-pages repository
+        run: |
+          git fetch origin gh-pages --depth=1
 
       - name: Set up Python runtime
         uses: actions/setup-python@v3
@@ -69,21 +90,12 @@ jobs:
             pymdown-extensions>=9.3 \
             mike>=1.1.2
 
-      - name: Configure Git user
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          
-      - name: Fetch gh-pages repository
-        run: |
-          git fetch origin gh-pages --depth=1
-
       - name: Deploy documentation
         if: ${{ github.ref_type == 'branch' }}
         run: |
           mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }}
           
       - name: Deploy documentation and update alias for latest
-        if: ${{ github.ref_type == 'tag' && contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}
+        if: ${{ github.ref_type == 'tag' && env.LATEST_VERSION == env.TAG_VERSION }}
         run: |
-          mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }} latest
+          mike deploy --push --update-aliases ${{ env.TAG_VERSION }} latest
