@@ -48,6 +48,7 @@ jobs:
       - name: Shorten tag version
         id: tag_version
         if: ${{ github.ref_type == 'tag' }}
+        uses: actions/github-script@v6
         env:
           TAG_NAME: ${{ github.ref_name }}
         with: 
