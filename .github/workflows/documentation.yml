@@ -1,27 +1,81 @@
+# Documentation deployment workflow.
+#
+# Documentation is always deployed for master and releases branch.
+# deployed  is deployed on the latest release branch or on the new
+# latest release. This prevents bugfixes on older releases to override the
+# latest documentation.
 name: documentation
 on:
   push:
     branches:
-      - "release-*"
-      #- master
-      #- feature/multiple-servers
-
-env:
-  PYTHON_VERSION: 3.x
-
+      - release-*
+      - master
+    tags:
+      - v*
+      
 jobs:
-  documentation:
-    name: Build documentation
+  deploy_docs:
+    name: Deploy documentation
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.8 ]
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v3
+        
+      - name: Get latest repository version
+        id: latest_version
+        uses: oprypin/find-latest-tag@v1.1.0
+        with:
+          repository: ${{ github.repository }}
+          prefix: 'v'
+        
+      - name: Extract version from branch name
+        id: branch_version
+        uses: actions/github-script@v6
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+        with:
+          result-encoding: string
+          script: |
+            const prefix = 'v'
+            const branch = process.env.BRANCH_NAME
+            version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
+            version = version.startsWith(prefix) ? version : prefix + version
+            return branch.includes('release') ? version : branch
+                
+      - name: Shorten tag version
+        id: tag_version
+        if: ${{ github.ref_type == 'tag' }}
+        uses: actions/github-script@v6
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        with: 
+          result-encoding: string
+          script: |
+            version = process.env.TAG_NAME
+            return version.substring(0, version.lastIndexOf('.'))
+
+      - name: Export versions as environment variables
+        run: |
+          echo "BRANCH_VERSION=${{ steps.branch_version.outputs.result }}" >> $GITHUB_ENV
+          echo "LATEST_VERSION=${{ steps.latest_version.outputs.tag }}" >> $GITHUB_ENV
+          echo "TAG_VERSION=${{ steps.tag_version.outputs.result }}" >> $GITHUB_ENV
+      
+      - name: Configure Git user
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          
+      - name: Fetch gh-pages repository
+        run: |
+          git fetch origin gh-pages --depth=1
 
       - name: Set up Python runtime
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: ${{ matrix.python-version }}
 
       - name: Install Python dependencies
         run: |
@@ -34,42 +88,15 @@ jobs:
             mkdocs-minify-plugin>=0.5 \
             mkdocs-redirects>=1.0 \
             pygments>=2.11 \
-            pymdown-extensions>=9.3
-      # mike >= 1.2 \
-
-      - name: Extract release version from branch name
-        id: branch_version
-        uses: actions/github-script@v6
-        with:
-          result-encoding: string
-          script: |
-            const branchName = process.env.GITHUB_REF
-            const releaseVersion = branchName.substring( branchName.lastIndexOf('-') + 1 , branchName.length )
-            return "v" + releaseVersion
-
-      - name: Get latest repository version
-        id: latest_release_version
-        uses: oprypin/find-latest-tag@v1.1.0
-        with:
-          repository: ${{ github.repository }}
-          prefix: 'v'
-        
-
-      - name: Print versions
-        env:
-          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
-          LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
-        run: |
-          echo "Branch version: $BRANCH_VERSION"
-          echo "Latest version: $LATEST_VERSION"
-
-      # - name: Deploy documentation if on latest branch
-      #   run: mike deploy --push --update-aliases ${{ steps.branch_version.outputs.result }}
+            pymdown-extensions>=9.3 \
+            mike>=1.1.2
 
       - name: Deploy documentation
-
-        if: contains( steps.latest_release_version.outputs.result, steps.branch_version.outputs.result )
+        if: ${{ github.ref_type == 'branch' }}
         run: |
-          mkdocs gh-deploy --force
-
-
+          mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }}
+          
+      - name: Deploy documentation and update alias for latest
+        if: ${{ github.ref_type == 'tag' && env.LATEST_VERSION == env.BRANCH_VERSION }}
+        run: |
+          mike deploy --push --update-aliases ${{ env.TAG_VERSION }} latest
