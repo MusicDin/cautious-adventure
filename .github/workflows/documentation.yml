@@ -55,7 +55,7 @@ jobs:
           result-encoding: string
           script: |
             version = process.env.TAG_NAME
-            return version.substring(0, version.lastIndexOf('-'))
+            return version.substring(0, version.lastIndexOf('.'))
 
       - name: Export versions as environment variables
         run: |
