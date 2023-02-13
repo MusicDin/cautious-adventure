@@ -39,15 +39,14 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const prefix = 'v'
             const branch = process.env.BRANCH_NAME
-            version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
-            version = version.startsWith(prefix) ? version : prefix + version
-            if (branch.includes('release')) {
-              return version
-            }
             if (branch == 'master') {
-              return latest
+              return 'latest'
+            }
+            if (branch.includes('release')) {
+              const prefix = 'v'
+              const version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
+              return version.startsWith(prefix) ? version : prefix + version
             }
             return branch
                 
