@@ -104,4 +104,4 @@ jobs:
       - name: Deploy documentation and update alias for latest
         if: ${{ github.ref_type == 'tag' && env.LATEST_VERSION == env.BRANCH_VERSION }}
         run: |
-          mike deploy --push --update-aliases ${{ env.TAG_VERSION }} stable
+          mike deploy --push --update-aliases ${{ env.TAG_VERSION }} latest-release
