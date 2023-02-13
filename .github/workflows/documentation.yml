@@ -43,7 +43,13 @@ jobs:
             const branch = process.env.BRANCH_NAME
             version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
             version = version.startsWith(prefix) ? version : prefix + version
-            return branch.includes('release') ? version : branch
+            if (branch.includes('release')) {
+              return version
+            }
+            if (branch == 'master') {
+              return latest
+            }
+            return branch
                 
       - name: Shorten tag version
         id: tag_version
@@ -99,4 +105,4 @@ jobs:
       - name: Deploy documentation and update alias for latest
         if: ${{ github.ref_type == 'tag' && env.LATEST_VERSION == env.BRANCH_VERSION }}
         run: |
-          mike deploy --push --update-aliases ${{ env.TAG_VERSION }} latest
+          mike deploy --push --update-aliases ${{ env.TAG_VERSION }} stable
