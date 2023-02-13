@@ -8,10 +8,10 @@ edit_uri: ""
 
 theme:
   name: material
-  custom_dir: docs/theme/overrides
+  custom_dir: docs/overrides
 
-  favicon: theme/assets/images/favicon.svg
-  logo: theme/assets/images/logo_white.svg
+  favicon: assets/images/favicon.svg
+  logo: assets/images/logo_white.svg
 
   palette:
     - scheme: default
@@ -39,10 +39,10 @@ theme:
     repo: fontawesome/brands/github
 
 extra_css:
-  - theme/assets/stylesheets/style.css
+  - assets/stylesheets/style.css
 
 extra_javascript:
-  - theme/assets/javascripts/extra.js
+  - assets/javascripts/extra.js
 
 extra:
   version:
