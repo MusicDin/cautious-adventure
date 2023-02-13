@@ -1,6 +1,10 @@
-<h1 align="center"> Troubleshooting</h1>
+<div markdown="1" class="text-center">
+# Troubleshooting
+</div>
 
-??? question "Is your problem not listed here?"
+<div markdown="1" class="text-justify">
+
+!!! question "Is your issue not listed here?"
 
     If the troubleshooting page is missing an error you encountered, please report it on GitHub by [opening an issue](https://github.com/MusicDin/kubitect/issues/new).
     By doing so, you will help improve the project and help others find the solution to the same problem faster.
@@ -17,7 +21,7 @@
 
         /bin/sh: 2: ansible-playbook: not found
 
-=== ":material-information: Explanation"
+=== ":material-information-outline: Explanation"
 
     !!! info "Explanation"
 
@@ -52,7 +56,7 @@
 
         Error: virError(Code=38, Domain=7, Message='Failed to connect socket to '/var/run/libvirt/libvirt-sock': No such file or directory')
 
-=== ":material-information: Explanation"
+=== ":material-information-outline: Explanation"
 
     !!! info "Explanation"
 
@@ -85,7 +89,7 @@
 
         Error: virError(Code=38, Domain=7, Message='Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied')
 
-=== ":material-information: Explanation"
+=== ":material-information-outline: Explanation"
 
     !!! info "Explanation"
 
@@ -103,13 +107,13 @@
         Add the current user to the `libvirt` and `kvm` groups if needed:
         ```sh
         # Add current user to groups
-        sudo usermod -aG libvirt,kvm `id -un`
+        sudo adduser $USER libvirt
+        sudo adduser $USER kvm
 
         # Verify groups are added
         id -nG
 
         # Reload user session
-        su - `id -un`
         ```
 
 ### Error creating libvirt domain
@@ -120,7 +124,7 @@
 
         Error: Error creating libvirt domain: … Could not open '/tmp/terraform_libvirt_provider_images/image.qcow2': Permission denied')
 
-=== ":material-information: Explanation"
+=== ":material-information-outline: Explanation"
 
     !!! info "Explanation"
 
@@ -157,7 +161,7 @@
 
         Error: Error defining libvirt domain: virError(Code=9, Domain=20, Message='operation failed: domain '**your-domain**' already exists with uuid '...')
 
-=== ":material-information: Explanation"
+=== ":material-information-outline: Explanation"
 
     !!! info "Explanation"
 
@@ -197,7 +201,7 @@
 
         Error:Error creating libvirt volume for cloudinit device <b>cloud-init</b>.iso: virError(Code=90, Domain=18, Message='storage volume '<b>cloud-init</b>.iso' exists already')
 
-=== ":material-information: Explanation"
+=== ":material-information-outline: Explanation"
 
     !!! info "Explanation"
 
@@ -228,7 +232,7 @@
 
         Error: Error storage pool '**your-pool**' already exists
 
-=== ":material-information: Explanation"
+=== ":material-information-outline: Explanation"
 
     !!! info "Explanation"
 
@@ -252,7 +256,7 @@
 
         Error: internal error: Failed to apply firewall rules /sbin/iptables -w --table filter --insert LIBVIRT_INP --in-interface virbr2 --protocol tcp --destination-port 67 --jump ACCEPT: iptables: No chain/target/match by that name.
 
-=== ":material-information: Explanation"
+=== ":material-information-outline: Explanation"
 
     !!! info "Explanation"
 
@@ -274,9 +278,9 @@
 
     !!! failure "Error"
 
-        Error: error deleting storage pool: failed to remove pool '/var/lib/libvirt/pools/local-k8s-cluster-main-resource-pool': Directory not empty
+        Error: error deleting storage pool: failed to remove pool '/var/lib/libvirt/images/local-k8s-cluster-main-resource-pool': Directory not empty
 
-=== ":material-information: Explanation"
+=== ":material-information-outline: Explanation"
 
     !!! info "Explanation"
 
@@ -298,7 +302,7 @@
 
         #  Name         Path
         # -------------------------------------------------------------------------------------
-        #  base_volume  /var/lib/libvirt/pools/local-k8s-cluster-main-resource-pool/base_volume
+        #  base_volume  /var/lib/libvirt/images/local-k8s-cluster-main-resource-pool/base_volume
         ```
 
         3. Delete listed volumes from the pool.
@@ -324,7 +328,7 @@
 
         HAProxy returns a random *HTTP 503 (Bad gateway)* error.
 
-=== ":material-information: Explanation"
+=== ":material-information-outline: Explanation"
 
     !!! info "Explanation"
 
@@ -354,3 +358,4 @@
 
         Check the HAProxy configuration file (`config/haproxy/haproxy.cfg`) that it does not contain 2 frontends bound to the same port.
 
+</div>

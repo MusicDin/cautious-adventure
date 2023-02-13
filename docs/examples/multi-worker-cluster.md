@@ -1,29 +1,29 @@
 <div markdown="1" class="text-center">
-# Single node cluster
+# Multi-worker cluster
 </div>
 
 <div markdown="1" class="text-justify">
 
-This example shows how to setup a single node Kubernetes cluster using Kubitect.
+This example shows how to use Kubitect to set up a Kubernetes cluster with **one master and three worker nodes**.
 
 <div class="text-center">
   <img
-    class="mobile-w-75"
-    src="/assets/images/topology-1m-arch.png" 
-    alt="Architecture of a single node cluster"
-    width="50%">
+    class="mobile-w-100"
+    src="/assets/images/topology-1m3w-arch.png" 
+    alt="Architecture of the cluster with 1 master and 3 worker nodes"
+    width="75%">
 </div>
 
 !!! note "Note"
 
     In this example we skip the explanation of some common configurations (hosts, network, node template, ...), as they are already explained in the [Getting started (step-by-step)](../../getting-started/getting-started) guide.
 
-## Step 1: Create the configuration
+## Step 1: Cluster configuration
 
-If you want to initialize a cluster with only one node,
-specify a single master node in the cluster configuration file:
+To create a cluster with multiple workers, simply specify multiple worker nodes in the configuration.
+In this particular case, we want to have 3 worker nodes, but there can be as many as you want.
 
-```yaml title="single-node.yaml" 
+```yaml title="multi-worker.yaml" 
 cluster:
   ...
   nodes:
@@ -31,6 +31,13 @@ cluster:
       instances:
         - id: 1
           ip: 192.168.113.10 # (1)!
+    worker:
+      instances:
+        - id: 1
+          ip: 192.168.113.21
+        - id: 7
+          ip: 192.168.113.27
+        - id: 99
 ```
 
 1.  Static IP address of the node. 
@@ -38,7 +45,7 @@ cluster:
 
 ??? abstract "Final cluster configuration <i class="click-tip"></i>"
 
-    ```yaml title="single-node.yaml" 
+    ```yaml title="multi-worker.yaml" 
     hosts:
       - name: localhost
         connection:
@@ -58,13 +65,16 @@ cluster:
           distro: ubuntu
       nodes:
         master:
-          default:
-            ram: 4
-            cpu: 2
-            mainDiskSize: 32
           instances:
             - id: 1
               ip: 192.168.113.10
+        worker:
+          instances:
+            - id: 1
+              ip: 192.168.113.21
+            - id: 7
+              ip: 192.168.113.27
+            - id: 99
 
     kubernetes:
       version: v1.23.7
@@ -78,9 +88,7 @@ cluster:
 
 Apply the cluster:
 ```sh
-kubitect apply --config single-node.yaml
+kubitect apply --config multi-worker.yaml
 ```
-
-Your master node now also becomes a worker node.
 
 </div>

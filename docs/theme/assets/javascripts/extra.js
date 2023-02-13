@@ -1,22 +1,17 @@
 /*
- * Remove code block hashtags before annotations
+ * Landing page terminal
  */
 
 // initial url path
-var oldHref = document.location.href;
-var prevPath = window.location.pathname;
-
-// remove hastags when content is loaded for the first time
-window.addEventListener('DOMContentLoaded', removeHashtags)
+let prevPath = window.location.pathname;
 
 // trigger terminal animation when window loads
 window.addEventListener('DOMContentLoaded', terminalAnimation)
 
 window.onload = function () {
+    let bodyList = document.querySelector("body")
 
-    var bodyList = document.querySelector("body")
-
-    var observer = new MutationObserver((mutations) => {
+    let observer = new MutationObserver(() => {
 
         // check if paths differ
         if (prevPath !== window.location.pathname) {
@@ -25,62 +20,35 @@ window.onload = function () {
             prevPath = window.location.pathname;
 
             if (window.location.pathname === '/') {
-
-                // trigger terminal animation on landing page
                 terminalAnimation()
-
-            } else {
-                mutations.forEach(() => {
-                    if (oldHref != document.location.href) {
-
-                        // update href to match current location
-                        oldHref = document.location.href;
-
-                        // wait for annotations and remove hashtags
-                        removeHashtags()
-                    }
-                });
-            }
+            } 
         }
-    });
+    })
 
     // start observing body for mutations
     observer.observe(bodyList, { childList: true, subtree: true });
-};
-
-// waits until code block annotations are loaded and remove hashtags
-function removeHashtags() {
-
-    document.querySelectorAll("code").forEach((node) => {
-        let str = node.innerHTML
-        node.innerHTML = str.replace(/(# )(\([0-9]*\))/g, "$2")
-    })
-};
-
-/*
- * Landing page terminal
- */
+}
 
 // terminal animation
 function terminalAnimation() {
 
-    // miliseconds between each output line printed
+    // milliseconds between each output line printed
     const outputDelay = 50
 
-    // miliseconds before command is applied
+    // milliseconds before command is applied
     const applyCommandDelay = 250
 
-    // miliseconds before command is typed
+    // milliseconds before command is typed
     const startCommandDelay = 1000
 
-    // miliseconds between each command character typed
+    // milliseconds between each command character typed
     const commandCharDelay = 20
     
     const Output = Symbol("output")
     const Command = Symbol("command")
 
     const content = [
-        { type: Command, value: "curl -o kubitect.tar.gz -L https://github.com/MusicDin/kubitect/releases/..." },
+        { type: Command, value: "curl -o kubitect.tar.gz -L https://dl.kubitect.io/linux/amd64/latest" },
         { type: Command, value: "tar -xzf kubitect.tar.gz" },
         { type: Command, value: "sudo mv kubitect /usr/local/bin/" },
         { type: Command, value: "kubitect apply" },
@@ -89,10 +57,13 @@ function terminalAnimation() {
         { type: Output, value: "Setting up 'main' virtual environment..." },
         { type: Output, value: "Creating virtual environment..." },
         { type: Output, value: "Installing pip3 dependencies..." },
-        { type: Output, value: "This can take up to a minute when the virtual environment is initialized for the first time...<br>" },
-        { type: Output, value: "PLAY [localhost]<br>" },
+        { type: Output, value: "This can take up to a minute when the virtual environment is initialized for the first time..." },
+        { type: Output, value: "" },
+        { type: Output, value: "PLAY [Initialize cluster directory and verify cluster config]" },
+        { type: Output, value: "" },
         { type: Output, value: "TASK [cluster-config/copy : Make sure config directory exists]" },
-        { type: Output, value: "<span style=\"color:green\">ok: [127.0.0.1]</span><br>" },
+        { type: Output, value: "<span style=\"color:green\">ok: [localhost]</span>" },
+        { type: Output, value: "" },
         { type: Output, value: "..." }
     ]
 
@@ -117,7 +88,18 @@ function terminalAnimation() {
         value += '<span class="terminal-command-dollar-sign">$</span>'
 
         // add command element
-        value += '<span class=\"terminal-command\">' + command + '</span>'
+        value += '<span class="terminal-command">' + command + '</span>'
+
+        return value
+    }
+
+    // wraps the output into span element
+    function wrapOutput(line) {
+
+        let value = "";
+
+        // add command element
+        value += '<span class="terminal-output">' + line + '</span><br>'
 
         return value
     }
@@ -151,7 +133,7 @@ function terminalAnimation() {
 
                 case Output:
                     
-                    target.innerHTML += line.value + "<br>"
+                    target.innerHTML += wrapOutput(line.value)
                     await delay(outputDelay)
                     break
             }
@@ -161,7 +143,7 @@ function terminalAnimation() {
     // sets placeholder (transparent) content
     const setPlaceholder = async(target) => {
 
-        placeholder = ""
+        let placeholder = ""
 
         for (const line of content) {
 
@@ -200,7 +182,7 @@ function terminalAnimation() {
 
     setPlaceholder(terminalPlaceholder)
 
-    // vieport width lower than 768px --> mobile --> wait for scroll
+    // viewport width lower than 768px --> mobile --> wait for scroll
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     if (vw < 768) {
         document.getElementById('main-box').addEventListener('scroll', scrollEvent)

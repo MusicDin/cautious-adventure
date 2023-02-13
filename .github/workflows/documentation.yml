@@ -40,9 +40,6 @@ jobs:
           result-encoding: string
           script: |
             const branch = process.env.BRANCH_NAME
-            if (branch == 'master') {
-              return 'latest'
-            }
             if (branch.includes('release')) {
               const prefix = 'v'
               const version = branch.substring(branch.lastIndexOf('-') + 1, branch.length)
@@ -87,13 +84,13 @@ jobs:
           pip install \
             jinja2>=3.1 \
             markdown>=3.3 \
-            mkdocs>=1.3 \
-            mkdocs-material>=8.2.11 \
-            mkdocs-material-extensions>=1.0.3 \
-            mkdocs-minify-plugin>=0.5 \
+            mkdocs>=1.4 \
+            mkdocs-material>=9.0 \
+            mkdocs-material-extensions>=1.1 \
+            mkdocs-minify-plugin>=0.6 \
             mkdocs-redirects>=1.0 \
-            pygments>=2.11 \
-            pymdown-extensions>=9.3 \
+            pygments>=2.14 \
+            pymdown-extensions>=9.9 \
             mike>=1.1.2
 
       - name: Deploy documentation
@@ -104,4 +101,4 @@ jobs:
       - name: Deploy documentation and update alias for latest
         if: ${{ github.ref_type == 'tag' && env.LATEST_VERSION == env.BRANCH_VERSION }}
         run: |
-          mike deploy --push --update-aliases ${{ env.TAG_VERSION }} latest-release
+          mike deploy --push --update-aliases ${{ env.TAG_VERSION }} latest
